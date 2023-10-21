@@ -25,7 +25,7 @@ int main()
             b_hdd.push_back(b[i] > b[i - 1] ? b[i] : b[i - 1]);
     */
     getline(cin, b);
-    for (auto iter = b.begin() + 1; iter != b.end(); iter++)
+    for (auto iter = b.begin() + 1; iter != b.end(); iter++) // 尝试使用auto
         if (num(*iter) % 2 == num(*(iter - 1)) % 2)
             b_hdd.push_back(*iter > *(iter - 1) ? *iter : *(iter - 1));
     
