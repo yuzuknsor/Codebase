@@ -46,7 +46,7 @@ inline void read(T &x)
         x = -x;
 }
 
-int main()
+signed main()
 {
     _clear_float_();
     int n;
