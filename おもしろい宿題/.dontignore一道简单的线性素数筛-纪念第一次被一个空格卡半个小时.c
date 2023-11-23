@@ -5,16 +5,14 @@ const int N = 1e4 + 10;
 
 int main()
 {
-    long long int n, pri[N >> 1], now = 0, sum = 0;
+    int m, n;
+    long long pri[N >> 1], now = 0;
     int vis[N];
     scanf("%lld", &n);
     for (int i = 2; i <= n; i++)
     {
-        if (sum + i > n)
-            break;
         if (!vis[i])
         {
-            sum += i;
             pri[++now] = i;
         }
         for (int j = 1; j <= now && pri[j] * i <= n; j++)
@@ -25,9 +23,16 @@ int main()
         }
     }
 
-    printf("2");
-    for (int i = 2; i <= now; ++i)
-        printf(" %lld", pri[i]);
-    printf("\ncount = %lld", now);
+    int count = 0;
+    long long sum = 0;
+    for (int i = 1; i <= now; ++i)
+    {
+        if(pri[i] >= m)
+        {
+            count++;
+            sum += pri[i];
+        }
+    }
+    printf("%d %lld", count, sum);
     return 0;
 }
