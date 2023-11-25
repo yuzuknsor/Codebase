@@ -1,7 +1,6 @@
 #pragma GCC optimize(2)
 #pragma GCC optimize("Ofast")
-// #pragma GCC optimize("unroll-loops")
-
+#pragma GCC optimize("unroll-loops")
 #include <bits/stdc++.h>
 #ifndef LOCAL
 #define debug(...) 42
