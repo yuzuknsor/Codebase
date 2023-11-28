@@ -7,6 +7,8 @@
 #define _ERROR_QUANTITY_OVERFLOW_ 3
 #define _ERROR_NO_CONTENT_ 4
 namespace filesys = std::filesystem;
+#define iter_REC recursive_directory_iterator // recursive_directory_iterator
+#define iter_DIR directory_iterator           // directory_iterator
 
 void __Check_Inputs(int argc, char *argv[])
 {
@@ -126,7 +128,7 @@ int main(int argc, char *argv[])
     else if (if_search_subdirectories == "Y" || "y")
     {
         search_Subdirectories = __Has_Subdirectories(directory_Path);
-        if(!search_Subdirectories)
+        if (!search_Subdirectories)
         {
             std::cerr << "ERROR: No subdirectories found! " << std::endl;
             std::cout << "Searching current directory..." << std::endl;
@@ -137,48 +139,31 @@ int main(int argc, char *argv[])
         search_Subdirectories = __Confirm_Subdirectories(directory_Path);
     }
 
+    //    auto search_scope;
     if (search_Subdirectories)
-    {
-        for (filesys::directory_entry const &entry : filesys::recursive_directory_iterator(directory_Path))
-        {
-            if (entry.path().extension() == file_Extension)
-            {
-                std::ifstream file(entry.path());
-                std::string line;
-                while (getline(file, line))
-                {
-                    total_Lines++;
-                }
-            }
-        }
-        if (total_Lines == 0)
-        {
-            std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << std::endl;
-            return _ERROR_NO_CONTENT_; // RETURN CODE 4
-            system("pause");
-        }
-    }
+        search_scope = filesys::iter_REC(directory_Path);
     else
+        search_scope = filesys::iter_DIR(directory_Path);
+
+    for (const auto &entry : search_scope)
     {
-        for (filesys::directory_entry const &entry : filesys::directory_iterator(directory_Path))
+        if (entry.path().extension() == file_Extension)
         {
-            if (entry.path().extension() == file_Extension)
+            std::ifstream file(entry.path());
+            std::string line;
+            while (getline(file, line))
             {
-                std::ifstream file(entry.path());
-                std::string line;
-                while (getline(file, line))
-                {
-                    total_Lines++;
-                }
+                total_Lines++;
             }
         }
-        if (total_Lines == 0)
-        {
-            std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << ". " << std::endl;
-            return _ERROR_NO_CONTENT_; // RETURN CODE 4
-            system("pause");
-        }
     }
+    if (total_Lines == 0)
+    {
+        std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << std::endl;
+        return _ERROR_NO_CONTENT_; // RETURN CODE 4
+        system("pause");
+    }
+
     if (total_Lines < 0)
     {
         std::cerr << "ERROR: LINES QUANTITY OVERFLOW! " << std::endl;
