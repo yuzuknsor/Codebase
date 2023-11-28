@@ -15,11 +15,9 @@ int main()
         {
             pri[++now] = i;
         }
-        for (int j = 1; j <= now && pri[j] * i <= n; j++)
+        for (int j = 1, mult = pri[j] * i; j <= now && mult <= n; j++)
         {
-            vis[pri[j] * i] = 1;
-            if (i % pri[j] == 0)
-                break;
+            vis[mult] = 1;
         }
     }
 

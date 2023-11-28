@@ -1,15 +1,56 @@
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <filesystem>
-#include <iostream>
 #define _ERROR_LACK_INPUT_ 1
 #define _ERROR_INVALID_INPUTS_ 2
 #define _ERROR_QUANTITY_OVERFLOW_ 3
 #define _ERROR_NO_CONTENT_ 4
-#define _ERROR_EXISTENCE_DIRECTORY_ 5
+namespace filesys = std::filesystem;
 
-using namespace std;
-namespace filesys = filesystem;
+void __Check_Inputs(int argc, char *argv[])
+{
+    if (argc < 2)
+    {
+        std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.) " << std::endl;
+        exit(_ERROR_LACK_INPUT_); // RETURN CODE 1
+        system("pause");
+    }
+    if (argc > 4)
+    {
+        std::cerr << "ERROR: Unnecessary inputs! " << std::endl;
+        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        system("pause");
+    }
+}
+
+void __Check_Inputs(int argc, char *argv[], std::string &file_Extension, std::string &directory_Path, std::string &if_search_subdirectories)
+{
+    if (argc < 2)
+    {
+        std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.) " << std::endl;
+        exit(_ERROR_LACK_INPUT_); // RETURN CODE 1
+        system("pause");
+    }
+    if (argc > 4)
+    {
+        std::cerr << "ERROR: Unnecessary inputs! " << std::endl;
+        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        system("pause");
+    }
+    if (file_Extension[0] != '.')
+    {
+        std::cerr << "ERROR: Invalid file extension! " << std::endl;
+        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        system("pause");
+    }
+    if (!filesys::exists(directory_Path))
+    {
+        std::cerr << "ERROR: Directory not found! " << std::endl;
+        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        system("pause");
+    }
+}
 
 bool __Has_Subdirectories(const filesys::path &p)
 {
@@ -27,80 +68,73 @@ bool __Has_Subdirectories(const filesys::path &p)
     return false;
 }
 
-int main(int argc, char *argv[])
+bool __Confirm_Subdirectories(const filesys::path &p)
 {
-    if (argc < 2)
+    if (__Has_Subdirectories(p))
     {
-        cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.)" << endl;
-        return _ERROR_LACK_INPUT_; // RETURN CODE 1
-        system("pause");
-    }
-    if (argc > 3)
-    {
-        cerr << "ERROR: Unnecessary inputs! " << endl;
-        return _ERROR_INVALID_INPUTS_; // RETURN CODE 2
-        system("pause");
-    }
-
-    size_t total_Lines = 0;
-    string directory_Path = argv[2];
-    string file_Extension = argv[1];
-    /*
-        if(file_Extension.empty())
-        {
-            cerr << "ERROR: File extension not found! " << endl;
-            return _ERROR_LACK_INPUT_; // RETURN CODE 1
-            system("pause");
-        }
-    */
-    if (directory_Path.empty())
-    {
-        directory_Path = filesys::current_path();
-    }
-    if (!filesys::exists(directory_Path))
-    {
-        cerr << "ERROR: Directory not found! " << endl;
-        return _ERROR_EXISTENCE_DIRECTORY_; // RETURN CODE 5
-        system("pause");
-    }
-
-    bool search_Subdirectories = false;
-    if (__Has_Subdirectories(directory_Path))
-    {
-        int attempts = 0;
-        while (attempts < 3)
+        int attempts = 3;
+        for (; attempts > 0; --attempts)
         {
             char if_search_Subdirectories;
-            cout << "Search subdirectories? [Y/N]: " << endl;
-            cin >> if_search_Subdirectories;
+            std::cout << "Subdirectories found." << std::endl;
+            std::cout << "Search in subdirectories? [Y/N]: " << std::endl;
+            std::cin >> if_search_Subdirectories;
 
             if (if_search_Subdirectories == 'Y' || if_search_Subdirectories == 'y')
             {
-                cout << "Searching (with subdirectories) ..." << endl;
-                break;
+                std::cout << "Subdirectories included." << std::endl;
+                std::cout << "Searching ..." << std::endl;
+                return true;
             }
             else if (if_search_Subdirectories == 'N' || if_search_Subdirectories == 'n')
             {
-                cout << "Searching ..." << endl;
-                search_Subdirectories = true;
-                break;
+                std::cout << "Subdirectories excluded." << std::endl;
+                std::cout << "Searching ..." << std::endl;
+                return false;
             }
             else
             {
-                attempts++;
-                cerr << "ERROR: Invalid input! " << endl;
+                std::cerr << "ERROR: Invalid input! " << std::endl;
+                std::cerr << "Remaining " << attempts << " try: " << std::endl;
             }
         }
-        if (attempts == 3)
+        if (attempts == 0)
         {
-            cerr << "ERROR: Too many invalid inputs! " << endl;
-            return _ERROR_INVALID_INPUTS_; // RETURN CODE 2
-            system("pause");
+            std::cerr << "ERROR: Too many invalid inputs! " << std::endl;
+            std::cout << "Subdirectories excluded." << std::endl;
+            return false;
+        }
+    }
+    return false;
+}
+
+int main(int argc, char *argv[])
+{
+    size_t total_Lines = 0;
+    std::string file_Extension = argv[1];
+    std::string directory_Path = argv[2];
+    std::string if_search_subdirectories = argv[3];
+
+    __Check_Inputs(argc, argv, file_Extension, directory_Path, if_search_subdirectories);
+
+    // Confirm if search subdirectories.
+    bool search_Subdirectories = false;
+    if (if_search_subdirectories == "N" || "n")
+    {
+        search_Subdirectories = false;
+    }
+    else if (if_search_subdirectories == "Y" || "y")
+    {
+        search_Subdirectories = __Has_Subdirectories(directory_Path);
+        if(!search_Subdirectories)
+        {
+            std::cerr << "ERROR: No subdirectories found! " << std::endl;
+            std::cout << "Searching current directory..." << std::endl;
         }
     }
     else
     {
-        cout << "Searching ..." << endl;
+        search_Subdirectories = __Confirm_Subdirectories(directory_Path);
     }
 
     if (search_Subdirectories)
@@ -109,8 +143,8 @@ int main(int argc, char *argv[])
         {
             if (entry.path().extension() == file_Extension)
             {
-                ifstream file(entry.path());
-                string line;
+                std::ifstream file(entry.path());
+                std::string line;
                 while (getline(file, line))
                 {
                     total_Lines++;
@@ -119,7 +153,7 @@ int main(int argc, char *argv[])
         }
         if (total_Lines == 0)
         {
-            cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << endl;
+            std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << std::endl;
             return _ERROR_NO_CONTENT_; // RETURN CODE 4
             system("pause");
         }
@@ -130,8 +164,8 @@ int main(int argc, char *argv[])
         {
             if (entry.path().extension() == file_Extension)
             {
-                ifstream file(entry.path());
-                string line;
+                std::ifstream file(entry.path());
+                std::string line;
                 while (getline(file, line))
                 {
                     total_Lines++;
@@ -140,19 +174,19 @@ int main(int argc, char *argv[])
         }
         if (total_Lines == 0)
         {
-            cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << ". " << endl;
+            std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << ". " << std::endl;
             return _ERROR_NO_CONTENT_; // RETURN CODE 4
             system("pause");
         }
     }
     if (total_Lines < 0)
     {
-        cerr << "ERROR: LINES QUANTITY OVERFLOW! " << endl;
+        std::cerr << "ERROR: LINES QUANTITY OVERFLOW! " << std::endl;
         return _ERROR_QUANTITY_OVERFLOW_; // RETURN CODE 3
         system("pause");
     }
 
-    cout << "Total lines: " << total_Lines << endl;
+    std::cout << "Total lines: " << total_Lines << std::endl;
     system("pause");
 }
 
