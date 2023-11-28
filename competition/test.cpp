@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <filesystem>
+#include <variant>
 #define _ERROR_LACK_INPUT_ 1
 #define _ERROR_INVALID_INPUTS_ 2
 #define _ERROR_QUANTITY_OVERFLOW_ 3
@@ -9,22 +10,6 @@
 namespace filesys = std::filesystem;
 #define iter_REC recursive_directory_iterator // recursive_directory_iterator
 #define iter_DIR directory_iterator           // directory_iterator
-
-void __Check_Inputs(int argc, char *argv[])
-{
-    if (argc < 2)
-    {
-        std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.) " << std::endl;
-        exit(_ERROR_LACK_INPUT_); // RETURN CODE 1
-        system("pause");
-    }
-    if (argc > 4)
-    {
-        std::cerr << "ERROR: Unnecessary inputs! " << std::endl;
-        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
-        system("pause");
-    }
-}
 
 void __Check_Inputs(int argc, char *argv[], std::string &file_Extension, std::string &directory_Path, std::string &if_search_subdirectories)
 {
@@ -112,7 +97,6 @@ bool __Confirm_Subdirectories(const filesys::path &p)
 
 int main(int argc, char *argv[])
 {
-    size_t total_Lines = 0;
     std::string file_Extension = argv[1];
     std::string directory_Path = argv[2];
     std::string if_search_subdirectories = argv[3];
@@ -139,24 +123,28 @@ int main(int argc, char *argv[])
         search_Subdirectories = __Confirm_Subdirectories(directory_Path);
     }
 
-    //    auto search_scope;
+    // Count lines.
+    size_t total_Lines = 0;
+    std::variant<filesys::iter_REC, filesys::iter_DIR> search_Scope;
     if (search_Subdirectories)
-        search_scope = filesys::iter_REC(directory_Path);
+        search_Scope = filesys::iter_REC(directory_Path);
     else
-        search_scope = filesys::iter_DIR(directory_Path);
-
-    for (const auto &entry : search_scope)
-    {
-        if (entry.path().extension() == file_Extension)
+        search_Scope = filesys::iter_DIR(directory_Path);
+    std::visit([&](auto &&arg)
+               {
+        for (const auto &entry : arg)
         {
-            std::ifstream file(entry.path());
-            std::string line;
-            while (getline(file, line))
+            if (entry.path().extension() == file_Extension)
             {
-                total_Lines++;
+                std::ifstream file(entry.path());
+                std::string line;
+                while (getline(file, line))
+                {
+                    total_Lines += 1;
+                }
             }
-        }
-    }
+        } },
+               search_Scope);
     if (total_Lines == 0)
     {
         std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << std::endl;
