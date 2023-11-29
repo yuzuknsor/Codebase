@@ -3,10 +3,11 @@
 #include <string>
 #include <filesystem>
 #include <variant>
-#define _ERROR_LACK_INPUT_ 1
-#define _ERROR_INVALID_INPUTS_ 2
-#define _ERROR_QUANTITY_OVERFLOW_ 3
-#define _ERROR_NO_CONTENT_ 4
+// Error code
+#define _LACK_INPUT_ 1
+#define _INVALID_INPUTS_ 2
+#define _QUANTITY_OVERFLOW_ 3
+#define _NO_CONTENT_ 4
 namespace filesys = std::filesystem;
 #define iter_REC recursive_directory_iterator // recursive_directory_iterator
 #define iter_DIR directory_iterator           // directory_iterator
@@ -16,25 +17,25 @@ void __Check_Inputs(int argc, char *argv[], std::string &file_Extension, std::st
     if (argc < 2)
     {
         std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.) " << std::endl;
-        exit(_ERROR_LACK_INPUT_); // RETURN CODE 1
+        exit(_LACK_INPUT_); // RETURN CODE 1
         system("pause");
     }
     if (argc > 4)
     {
         std::cerr << "ERROR: Unnecessary inputs! " << std::endl;
-        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        exit(_INVALID_INPUTS_); // RETURN CODE 2
         system("pause");
     }
     if (file_Extension[0] != '.')
     {
         std::cerr << "ERROR: Invalid file extension! " << std::endl;
-        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        exit(_INVALID_INPUTS_); // RETURN CODE 2
         system("pause");
     }
     if (!filesys::exists(directory_Path))
     {
         std::cerr << "ERROR: Directory not found! " << std::endl;
-        exit(_ERROR_INVALID_INPUTS_); // RETURN CODE 2
+        exit(_INVALID_INPUTS_); // RETURN CODE 2
         system("pause");
     }
 }
@@ -95,6 +96,20 @@ bool __Confirm_Subdirectories(const filesys::path &p)
     return false;
 }
 
+template <typename T>
+void __Log(T &_LOG_)
+{
+    // _LOG_
+    // Normal error log & warn & continue.
+    // No permission error log & warn & continue.
+    // Fatal error log & exit.
+    // Filename log.
+    // Enter subdirectories log.
+    // TYPE:
+    // [DATE | TIME | POSITION | FILENAME | '.']
+    // [DATE | TIME | POSITION | FILENAME | '.' | ERROR CODE | SUGGESTED SOLUTION]
+}
+
 int main(int argc, char *argv[])
 {
     std::string file_Extension = argv[1];
@@ -148,14 +163,14 @@ int main(int argc, char *argv[])
     if (total_Lines == 0)
     {
         std::cerr << "ERROR: No content found in " << file_Extension << " files at " << directory_Path << " with subdirectories. " << std::endl;
-        return _ERROR_NO_CONTENT_; // RETURN CODE 4
+        return _NO_CONTENT_; // RETURN CODE 4
         system("pause");
     }
 
     if (total_Lines < 0)
     {
         std::cerr << "ERROR: LINES QUANTITY OVERFLOW! " << std::endl;
-        return _ERROR_QUANTITY_OVERFLOW_; // RETURN CODE 3
+        return _QUANTITY_OVERFLOW_; // RETURN CODE 3
         system("pause");
     }
 
@@ -164,10 +179,6 @@ int main(int argc, char *argv[])
 }
 
 // TODO:
-// Avoid using "using namespace" globally.
-// Add command option of searching subdirectories.
-// Functionize the code.
-// Rewrite the error code.
 // Add file extension check & warns.
 /*
     std::filesystem::path directory_Path = "your_directory_path_here";
@@ -185,3 +196,5 @@ int main(int argc, char *argv[])
 // Add permission check.
 // Use CMAKE multi -file programming.
 // Add to github repository as an opensource project.
+// Add log function.
+// RE-Define program behavior, make log tool easily get the information of [TIME&DATE], [BEHAVIOR], [ERROR CODE], [ERROR MESSAGE], [ERROR LINE], [ERROR FILE], [ERROR FUNCTION], [ERROR TYPE], [ERROR DESCRIPTION], [ERROR SOLUTION], [ERROR LOG], etc.
