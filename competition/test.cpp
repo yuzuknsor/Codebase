@@ -198,3 +198,4 @@ int main(int argc, char *argv[])
 // Add to github repository as an opensource project.
 // Add log function.
 // RE-Define program behavior, make log tool easily get the information of [TIME&DATE], [BEHAVIOR], [ERROR CODE], [ERROR MESSAGE], [ERROR LINE], [ERROR FILE], [ERROR FUNCTION], [ERROR TYPE], [ERROR DESCRIPTION], [ERROR SOLUTION], [ERROR LOG], etc.
+// Multithreading & asynchronous optimization.
