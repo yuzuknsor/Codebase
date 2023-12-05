@@ -3,15 +3,28 @@
 #include <string>
 #include <filesystem>
 #include <variant>
-// Error code
-#define _LACK_INPUT_ 1
-#define _INVALID_INPUTS_ 2
-#define _QUANTITY_OVERFLOW_ 3
-#define _NO_CONTENT_ 4
+// ---------------------
+class ERROR_CODE {
+    public:
+    int code_;
+    std::string message_;
+    ERROR_CODE(int code, std::string message) : code_(code), message_(message) {}
+    // 成员函数指定ERROR_CODE类型，参数或成员函数为操作(exit或log)的对象。
+
+};
+// Standard library
+const int _START_ = 0;
+const int _END_ = -1;
+const int _LACK_INPUT_ = 1;
+const int _INVALID_INPUTS_ = 2;
+const int _QUANTITY_OVERFLOW_ = 3;
+const int _NO_CONTENT_ = 4;
+const int _NO_PERMISSION_ = 5;
+// Namespaces
 namespace filesys = std::filesystem;
 #define iter_REC recursive_directory_iterator // recursive_directory_iterator
 #define iter_DIR directory_iterator           // directory_iterator
-
+// Functions
 void __Check_Inputs(int argc, char *argv[], std::string &file_Extension, std::string &directory_Path, std::string &if_search_subdirectories)
 {
     if (argc < 2)
@@ -96,10 +109,25 @@ bool __Confirm_Subdirectories(const filesys::path &p)
     return false;
 }
 
+int __Permission_Check(const filesys::path &p)
+{
+    std::filesystem::path directory_Path = p;
+    std::filesystem::perms permissions = std::filesystem::status(directory_Path).permissions();
+
+    if ((static_cast<int>(permissions) & static_cast<int>(std::filesystem::perms::owner_read)) == static_cast<int>(std::filesystem::perms::none) ||
+        (static_cast<int>(permissions) & static_cast<int>(std::filesystem::perms::group_read)) == static_cast<int>(std::filesystem::perms::none) ||
+        (static_cast<int>(permissions) & static_cast<int>(std::filesystem::perms::others_read)) == static_cast<int>(std::filesystem::perms::none))
+    {
+        std::cerr << "ERROR: No permission to read directory " << directory_Path << std::endl;
+        return _NO_PERMISSION_; // RETURN CODE 5
+    }
+}
+
 template <typename T>
 void __Log(T &_LOG_)
 {
     // _LOG_
+    // Type check
     // Normal error log & warn & continue.
     // No permission error log & warn & continue.
     // Fatal error log & exit.
@@ -179,19 +207,6 @@ int main(int argc, char *argv[])
 }
 
 // TODO:
-// Add file extension check & warns.
-/*
-    std::filesystem::path directory_Path = "your_directory_path_here";
-    std::filesystem::perms p = std::filesystem::status(directory_Path).permissions();
-
-    if ((p & std::filesystem::perms::owner_read) == std::filesystem::perms::none ||
-        (p & std::filesystem::perms::group_read) == std::filesystem::perms::none ||
-        (p & std::filesystem::perms::others_read) == std::filesystem::perms::none)
-    {
-        std::cerr << "ERROR: No permission to read directory " << directory_Path << std::endl;
-        return _ERROR_NO_PERMISSION_; // RETURN CODE 5
-    }
-*/
 // Add file number & name check & output.
 // Add permission check.
 // Use CMAKE multi -file programming.
