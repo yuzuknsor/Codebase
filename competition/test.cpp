@@ -9,7 +9,6 @@ class ERROR_CODE {
     int code_;
     std::string message_;
     ERROR_CODE(int code, std::string message) : code_(code), message_(message) {}
-    // 成员函数指定ERROR_CODE类型，参数或成员函数为操作(exit或log)的对象。
 
 }_ERR_;
 // Standard library
@@ -29,7 +28,7 @@ void __Check_Inputs(int argc, char *argv[], std::string &file_Extension, std::st
 {
     if (argc < 2)
     {
-        std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while default is the current.) " << std::endl;
+        std::cerr << "ERROR: At least ONE file extension! (And optionally, ONE specified path, while DEFAULT is the current path.) " << std::endl;
         exit(_LACK_INPUT_); // RETURN CODE 1
         system("pause");
     }
