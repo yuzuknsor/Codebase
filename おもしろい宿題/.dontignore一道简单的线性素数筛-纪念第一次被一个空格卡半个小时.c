@@ -1,14 +1,18 @@
 // 线性素数筛解法 by Knsor
 #include <stdio.h>
 
-const int N = 1e4 + 10;
+const int N = 1e5 + 10;
 
 int main()
 {
-    int m, n;
-    long long pri[N >> 1], now = 0;
+    int n;
+    long pri[N], now = 0, count;
     int vis[N];
-    scanf("%lld", &n);
+    for (int i = 0; i < N; i++)
+    {
+        vis[i] = 0;
+    }
+    scanf("%d", &n);
     for (int i = 2; i <= n; i++)
     {
         if (!vis[i])
@@ -19,18 +23,12 @@ int main()
         {
             vis[mult] = 1;
         }
-    }
-
-    int count = 0;
-    long long sum = 0;
-    for (int i = 1; i <= now; ++i)
-    {
-        if(pri[i] >= m)
+        if(pri[now] - pri[now - 1] == 2)
         {
             count++;
-            sum += pri[i];
         }
     }
-    printf("%d %lld", count, sum);
+
+    printf("%d\n", count - 1);
     return 0;
 }

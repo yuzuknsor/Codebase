@@ -11,7 +11,7 @@ class ERROR_CODE {
     ERROR_CODE(int code, std::string message) : code_(code), message_(message) {}
     // 成员函数指定ERROR_CODE类型，参数或成员函数为操作(exit或log)的对象。
 
-};
+}_ERR_;
 // Standard library
 const int _START_ = 0;
 const int _END_ = -1;
