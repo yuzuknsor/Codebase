@@ -75,5 +75,5 @@
         "valarray": "cpp",
         "variant": "cpp"
     },
-    "C_Cpp.default.compilerPath": "/usr/bin/g++",
+    "C_Cpp.default.compilerPath": "/usr/bin/clang++-10",
 }
