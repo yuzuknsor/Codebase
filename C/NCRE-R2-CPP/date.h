@@ -77,5 +77,53 @@ std::string成员函数
     引用和迭代
     引用传参
 
+    自身类的指针作为自身类的成员出现，这种指针称为this指针（作用）
+
+    类的实例，除了对象还有引用和指针
+
     
-*/
+    */
+
+#include <iostream>
+using std::cin;
+using std::cout;
+using std::endl;
+class Date {
+    int year, month, day;
+public:
+    Date(int y, int m, int d)
+    {
+        year = y;
+        month = m;
+        day = d;
+        cout << "Constructor of Date with 3 parameters." << endl;
+    }
+    Date(int y = 2000) : year(y)
+    {
+        month = 10;
+        day = 1;
+        cout << "Constructor of Date with 1 parameter." << endl;
+    }
+    ~Date()
+    {
+        cout << "Destructor of Date: " << year << "-" << month << "-" << day << endl;
+    }
+    void print()
+    {
+        cout << year << "-" << month << "-" << day << endl;
+    }
+    bool IsLeapYear()
+    {
+        return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+    }
+    Date &Date::AddYear(int n)
+    {
+        if (day == 29 && month == 2 && !IsLeapYear())
+        {
+            day = 1;
+            month = 3;
+        }
+        year += n;
+        return *this; // 解引用
+    }
+};
