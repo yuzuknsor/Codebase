@@ -42,3 +42,22 @@ for pet in pets:
 numbers = [num for num in range(3, 31) if num % 3 == 0]
 for number in numbers:
     print(number)
+
+def myFunc(a, b, *args, **kwargs):
+    item = {}
+    aa = a
+    bb = b
+    item['a'] = aa
+    item['b'] = b
+    for i, ele in enumerate(args):
+        item[i] = ele
+    for key, val in kwargs.items():
+        item[key] = val
+    return item
+
+user_input = input("Please enter your arguments, separated by spaces: ")
+user_args = user_input.split() #将用户输入的字符串分割成多个子字符串
+
+temp = myFunc(*user_args, name = '123', color = 'black') #从命令行读取用户输入的参数，分为多个参数传给myFunc
+
+print(temp)

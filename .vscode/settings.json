@@ -76,4 +76,7 @@
         "variant": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/clang++-10",
+    "python.jediEnabled": true,
+    "python.autoComplete.addBrackets": true,
+    "python.analysis.completeFunctionParens": true,
 }
