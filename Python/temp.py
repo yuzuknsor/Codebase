@@ -7,7 +7,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
 }
 
-# 
+# Define the base URL
 base_url = "https://www.biqugen.net/book/36454/14212082.html"
 with open("121.txt", "a+", encoding="utf-8") as f:
     f.truncate(0)
